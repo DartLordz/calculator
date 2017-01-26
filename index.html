@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset = "utf-8"/>
+        <title>Calculator</title>
+        <style>
+            #wrap {
+              width: 400px;
+              margin: 0 auto;
+              text-align: left;
+              margin-top: 8px;
+              padding: 5px;
+              background: #fff;
+              font-family: AvenirLTStd, Arial, Helvetica, sans-serif;
+              font-size: 13px;
+              line-height: 16px;
+            }
+
+            #wrap legend {
+              font-size: 16px;
+              font-family: Georgia, "Times New Roman", Times, serif;
+              color: #000;
+              font-weight: bold;
+              font-style: italic;
+              padding-bottom: 10px;
+            }
+
+            #wrap label {
+              display: block;
+              font-size: 12px;
+              color: #000;
+              font-weight: bold;
+            }
+
+            #wrap label.inlinelabel {
+              display: inline;
+            }
+
+            #wrap input[type="radio"] {
+              margin-top: 8px;
+              margin-bottom: 8px;
+            }
+
+            #wrap input[type="text"]:hover,
+            #wrap input[type="text"]:active {
+              background-color: #FAF398;
+            }
+
+            #wrap div#totalPrice {
+              padding: 10px;
+              font-weight: bold;
+              background-color: #ff0;
+            }
+
+            #wrap label.radiolabel {
+              font-weight: normal;
+              display: inline;
+            }
+
+        </style>
+    </head>
+    
+    <body>
+        <div id="wrap">
+          <form action="" id="cakeform">
+            <fieldset>
+              <legend>Создай свой пирог</legend>
+              <label>Размер пирога</label>
+              <br/>
+              <input type="radio" name="selectedcake" value="Round15" /> Круглый 15см - на 8 человек (200грн)
+              <br/>
+              <input type="radio" name="selectedcake" value="Round20" /> Круглый 20см - на 10 человек (250грн)
+              <br/>
+              <input type="radio" name="selectedcake" value="Round25" /> Круглый 25см - на 12 человек (300грн)
+              <br/>
+              <input type="radio" name="selectedcake" value="Round30" /> Круглый 30см - на 16 человек (350грн)
+              <br/>
+              <br/>
+              <label>Начинка</label>
+
+              <select id="filling" name='filling'>
+                <option value="None">Выберите начинку</option>
+                <option value="Lemon">Лимон с сахаром (50грн)</option>
+                <option value="Custard">Заварной крем (50грн)</option>
+                <option value="Fudge">Помадка (60грн)</option>
+                <option value="Mocha">Кофе (70грн)</option>
+                <option value="Raspberry">Малина (80грн)</option>
+                <option value="Pineapple">Ананас (70грн)</option>
+                <option value="Cherry">Вишня(70грн)</option>
+                <option value="Apricot">Абрикос(70грн)</option>
+                <option value="Buttercream">Масляный крем(60грн)</option>
+                <option value="Chocolate Mousse">Шоколад (60грн)</option>
+              </select>
+              <br/>
+              <p>
+                <label for='includecandles' class="inlinelabel">Добавить свечи (50грн)</label>
+                <input type="checkbox" id="includecandles" name='includecandles' />
+              </p>
+
+              <p>
+                <label class="inlinelabel" for='includeinscription'>Добавить надпись (100грн)</label>
+                <input type="checkbox" id="includeinscription" name="includeinscription" />
+
+                <input type="text" id="theinscription" name="theinscription" placeholder="Введите надпись" />
+              </p>
+              <div id="totalPrice"></div>
+
+            </fieldset>
+          </form>
+        </div>
+        
+        <script>
+        
+            var cakeForm = document.getElementById("cakeform");
+            var totalPriceText = "Общая стоимость";
+            var inputElems = cakeForm.getElementsByTagName("input");
+            
+            var addCandles = 50;
+            var addInscription = 100;
+
+            var cakeSize = [];
+            cakeSize["Round15"] = 200;
+            cakeSize["Round20"] = 250;
+            cakeSize["Round25"] = 300;
+            cakeSize["Round30"] = 350;
+            
+            var cakeFillingPrices = [];
+            cakeFillingPrices["None"] = 0;
+            cakeFillingPrices["Lemon"] = 50;
+            cakeFillingPrices["Custard"] = 50;
+            cakeFillingPrices["Fudge"] = 60;
+            cakeFillingPrices["Mocha"] = 70;
+            cakeFillingPrices["Raspberry"] = 80;
+            cakeFillingPrices["Pineapple"] = 70;
+            cakeFillingPrices["Cherry"] = 70;
+            cakeFillingPrices["Apricot"] = 70;
+            cakeFillingPrices["Buttercream"] = 60;
+            cakeFillingPrices["Chocolate Mousse"] = 60;
+
+            var calculateTotal = function() {
+              var total = getCakeSizePrice() + getFillingPrice();
+                if (cakeForm.elements["includecandles"].checked) {
+                    total += addCandles;
+                }
+                if (cakeForm.elements["includeinscription"].checked) {
+                    total += addInscription;
+                }
+              var totalDiv = document.getElementById("totalPrice");
+              totalDiv.innerHTML = totalPriceText + " " + total;
+            };
+
+            var getCakeSizePrice = function() {
+                var selectedCakes = cakeForm.elements["selectedcake"];
+                for (var i = 0; i < selectedCakes.length; i++) {
+                    if (selectedCakes[i].checked) {
+                        var selectedCakeSize = selectedCakes[i].value;
+                        return cakeSize[selectedCakeSize];
+                    }
+                }
+                return 0;
+            };
+            
+            var getFillingPrice = function() {
+                var selectedFilling = cakeForm.elements["filling"];
+                var cakeFillingPrice = cakeFillingPrices[selectedFilling.value];
+                return cakeFillingPrice;
+            }
+
+            for (var i = 0; i < inputElems.length; i++) {
+              inputElems[i].onclick = calculateTotal;
+            }
+
+            cakeForm.elements["filling"].onchange = calculateTotal;
+            
+        </script>
+        
+    </body>
+</html>
